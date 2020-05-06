@@ -13,6 +13,9 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemReader
+import org.springframework.batch.item.file.FlatFileItemReader
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
@@ -39,10 +42,27 @@ class BatchConfig(
     }
 
     @Bean
-    fun step1(csvItemReader: ItemReader<CsvUser>, csvItemWriter: CsvItemWriter, csvImporterProcessor: CsvImporterProcessor): Step {
+    fun csvItemReader2(csvUserMapper: CsvUserMapper): FlatFileItemReader<CsvUser> {
+        val lineTokenizer = DelimitedLineTokenizer(",")
+        lineTokenizer.setQuoteCharacter('"')
+        lineTokenizer.setNames("username", "description")
+
+        return FlatFileItemReaderBuilder<CsvUser>()
+                .name("csvItemReader2")
+                .resource(ClassPathResource("/csv/userdata.csv"))
+                .fieldSetMapper(csvUserMapper)
+                .lineTokenizer(lineTokenizer)
+                .linesToSkip(1)
+                .encoding(StandardCharsets.UTF_8.displayName())
+                .targetType(CsvUser::class.java)
+                .build()
+    }
+
+    @Bean
+    fun step1(csvItemReader2: ItemReader<CsvUser>, csvItemWriter: CsvItemWriter, csvImporterProcessor: CsvImporterProcessor): Step {
         return stepBuilderFactory.get("csvItemReaderStep")
                 .chunk<CsvUser, AppUser>(10)
-                .reader(csvItemReader)
+                .reader(csvItemReader2)
                 .processor(csvImporterProcessor)
                 .writer(csvItemWriter)
                 .build()
