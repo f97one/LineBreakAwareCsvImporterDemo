@@ -1,9 +1,10 @@
 spring:
   datasource:
-    hikari:
-      driver-class-name: org.postgresql.Driver
-      username: blog_db_admin
-      password: blog_db_admin
-      jdbc-url: jdbc:postgresql://localhost:5432/blog_db
+    driver-class-name: org.postgresql.Driver
+    username: blog_db_admin
+    password: blog_db_admin
+    url: jdbc:postgresql://localhost:5432/blog_db
   flyway:
     baseline-on-migrate: true
+  batch:
+    initialize-schema: always
