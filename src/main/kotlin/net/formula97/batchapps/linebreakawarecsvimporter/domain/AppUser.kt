@@ -3,7 +3,7 @@ package net.formula97.batchapps.linebreakawarecsvimporter.domain
 import javax.persistence.*
 
 @Entity(name = "app_user")
-class AppUser {
+class AppUser() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -12,4 +12,9 @@ class AppUser {
     var username: String = ""
     @Column(name = "description", length = 1024)
     var description: String? = null
+
+    constructor(username: String, description: String?): this() {
+        this.username = username
+        this.description = description
+    }
 }
