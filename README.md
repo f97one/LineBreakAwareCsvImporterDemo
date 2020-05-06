@@ -1,0 +1,2 @@
+# LineBreakAwareCsvImporterDemo
+Spring Batchでめちゃくちゃな改行を含むカラムをもつCSVを取り込むデモ
