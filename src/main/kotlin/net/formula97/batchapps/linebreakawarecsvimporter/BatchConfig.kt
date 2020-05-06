@@ -16,6 +16,7 @@ import org.springframework.batch.item.ItemReader
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
+import java.nio.charset.StandardCharsets
 
 @Configuration
 @EnableBatchProcessing
@@ -26,15 +27,15 @@ class BatchConfig(
 
     @Bean
     fun csvItemReader(csvUserMapper: CsvUserMapper): ItemReader<CsvUser> {
-        val reader = CsvItemReader<CsvUser>()
-        reader.setResource(ClassPathResource("/csv/userdata.csv"))
-        reader.setFieldSetMapper(csvUserMapper)
-        reader.linesToSkip = 1
-
-        val headers = arrayOf("username", "description")
-        reader.setHeaders(headers)
-
-        return reader
+        return CsvItemReader.Builder<CsvUser>()
+                .withCharset(StandardCharsets.UTF_8)
+                .withResource(ClassPathResource("/csv/userdata.csv"))
+                .withFieldSetMapper(csvUserMapper)
+                .withLinesToSkip(1)
+                .withHeaders(arrayOf("username", "description"))
+                .withDelimiterChar(',')
+                .withQuotedChar('"')
+                .build()
     }
 
     @Bean

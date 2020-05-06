@@ -23,8 +23,6 @@ class CsvItemReader<T>() : AbstractItemCountingItemStreamItemReader<T>(),
     var delimiter: Char = ','
     var quotedChar: Char = '"'
     var escapeChar: Char = '"'
-    var lineCount: Long = 0
-        private set
 
     private lateinit var resourceToRead: Resource
     private lateinit var headers: Array<String>
@@ -75,17 +73,13 @@ class CsvItemReader<T>() : AbstractItemCountingItemStreamItemReader<T>(),
         }
 
         val line: Array<out String> = csvReader.readNext() ?: return null
-        lineCount++
 
         val fs: FieldSet = DefaultFieldSet(line, headers)
         return fieldSetMapper.mapFieldSet(fs)
     }
 
     override fun doClose() {
-        lineCount = 0
-        if (csvReader != null) {
-            csvReader.close()
-        }
+        csvReader.close()
     }
 
     override fun setResource(resource: Resource) {
@@ -103,5 +97,53 @@ class CsvItemReader<T>() : AbstractItemCountingItemStreamItemReader<T>(),
 
     fun setFieldSetMapper(fieldSetMapper: FieldSetMapper<T>) {
         this.fieldSetMapper = fieldSetMapper
+    }
+
+    class Builder<T>() {
+        private val reader: CsvItemReader<T> = CsvItemReader()
+
+        fun build(): CsvItemReader<T> {
+            return reader
+        }
+
+        fun withResource(resource: Resource): Builder<T> {
+            reader.setResource(resource)
+            return this
+        }
+
+        fun withFieldSetMapper(fieldSetMapper: FieldSetMapper<T>): Builder<T> {
+            reader.fieldSetMapper = fieldSetMapper
+            return this
+        }
+
+        fun withHeaders(headers: Array<String>): Builder<T> {
+            reader.headers = headers
+            return this
+        }
+
+        fun withCharset(charset: Charset): Builder<T> {
+            reader.charset = charset
+            return this
+        }
+
+        fun withLinesToSkip(linesToSkip: Int): Builder<T> {
+            reader.linesToSkip = linesToSkip
+            return this
+        }
+
+        fun withDelimiterChar(delimiter: Char): Builder<T> {
+            reader.delimiter = delimiter
+            return this
+        }
+
+        fun withQuotedChar(quotedChar: Char): Builder<T> {
+            reader.quotedChar = quotedChar
+            return this
+        }
+
+        fun withEscapeChar(escapeChar: Char): Builder<T> {
+            reader.escapeChar = escapeChar
+            return this
+        }
     }
 }
